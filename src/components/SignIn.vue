@@ -6,7 +6,7 @@
         <input @change="INPUT_PASSWORD($event.target.value)" placeholder="Password" type="password" id="password">
         <button @click="ACCOUNT_SIGN_IN">Signin</button>
         <p>You don't have an account? 
-            <router-link to="/signup">create account now!!</router-link>
+            <button @click="JUNP_TO_SIGNUP">Create Account</button>
         </p>
     </div>
 </template>
@@ -17,17 +17,22 @@ import { mapGetters } from "vuex";
 
 import {
   ACCOUNT_SIGN_IN,
+  ACCOUNT_SIGN_UP,
   INPUT_ID,
   INPUT_PASSWORD,
-  CHANGE_PROFILES
+  CHANGE_PROFILES,
+  JUNP_TO_SIGNUP
 } from "../vuex/mutation-types";
 
 export default {
-  computed: {
-    ...mapGetters(["signin_successed"])
-  },
   methods: {
-    ...mapActions([ACCOUNT_SIGN_IN, INPUT_ID, INPUT_PASSWORD])
+    ...mapActions([
+      ACCOUNT_SIGN_IN,
+      ACCOUNT_SIGN_UP,
+      INPUT_ID,
+      INPUT_PASSWORD,
+      JUNP_TO_SIGNUP
+    ])
   }
 };
 </script>

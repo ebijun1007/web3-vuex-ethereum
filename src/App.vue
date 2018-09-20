@@ -7,7 +7,7 @@
       <Home/>
     </template>
     <template v-if="signin_successed == false && account_creating == true">
-      <SingUp/>
+      <SignUp/>
     </template>
   </div>
 </template>
