@@ -61,6 +61,9 @@ const actions = {
       eth_account_unlock(state.user_address, state.user_password)
       commit(SIGNIN_SUCCESSED)
       commit(ACCOUNT_CREATED)
+      eth_get_data(firebase.auth().currentUser.photoURL, contract_address).then(result => {
+        commit(HTC_GET_BALANCE, result)
+      })
     })
   },
   [ACCOUNT_SIGN_OUT]({
@@ -131,7 +134,6 @@ const mutations = {
     eth_get_data(state.user_address, contract_address).then(result => {
       state.user_balance = result
       state.isSignIn = true
-      state.current_user_address = ""
       state.user_id = firebase.auth().currentUser.displayName
       state.user_address = firebase.auth().currentUser.photoURL
     })
