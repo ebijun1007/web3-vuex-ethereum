@@ -131,12 +131,9 @@ const mutations = {
     state.user_password = password
   },
   [SIGNIN_SUCCESSED](state) {
-    eth_get_data(state.user_address, contract_address).then(result => {
-      state.user_balance = result
-      state.isSignIn = true
-      state.user_id = firebase.auth().currentUser.displayName
-      state.user_address = firebase.auth().currentUser.photoURL
-    })
+    state.isSignIn = true
+    state.user_id = firebase.auth().currentUser.displayName
+    state.user_address = firebase.auth().currentUser.photoURL
   },
   [SIGNIN_CLOSED](state) {
     state.isSignIn = false
