@@ -330,9 +330,9 @@ export const abi = [
     "type": "event"
   }]
 ]
-export const contract_address = "0xa6c624595c5ac7fc6bb418d57810f3b864030973"
+export const eth_getCont_address = "0xa6c624595c5ac7fc6bb418d57810f3b864030973"
 
-export function htc_getBalance(_address) {
+export function eth_getCont_hexAddress(_address) {
   var address = _address.slice(2);
   const eth_getCoinBalance = "0x70a08231000000000000000000000000" + address;
   return eth_getCoinBalance;

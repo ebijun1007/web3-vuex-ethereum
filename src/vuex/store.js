@@ -4,8 +4,8 @@ import axios from "axios"
 import firebase from "firebase"
 import Router from 'vue-router'
 import {
-  contract_address,
-  htc_getBalance
+  eth_getCont_address,
+  eth_getCont_hexAddress
 } from "../contracts/HealthCoin.js"
 
 Vue.use(Router)
@@ -14,6 +14,8 @@ Vue.use(Vuex)
 import {
   INPUT_ID,
   INPUT_PASSWORD,
+  INPUT_SEND_ADDRESS,
+  INPUT_SEND_AMOUNT,
   ACCOUNT_SIGN_IN,
   ACCOUNT_SIGN_OUT,
   SIGNIN_SUCCESSED,
@@ -22,7 +24,8 @@ import {
   ACCOUNT_CREATED,
   JUNP_TO_SIGNIN,
   JUNP_TO_SIGNUP,
-  HTC_GET_BALANCE
+  HTC_GET_BALANCE,
+  HTC_SEND
 } from './mutation-types'
 
 /**
@@ -34,6 +37,8 @@ const state = {
   user_password: "",
   user_address: "",
   user_balance: "",
+  send_address: "",
+  send_amount: "",
   isSignIn: false,
   account_creating: false
 }
@@ -53,6 +58,16 @@ const actions = {
   }, password) {
     commit(INPUT_PASSWORD, password)
   },
+  [INPUT_SEND_ADDRESS]({
+    commit
+  }, address) {
+    commit(INPUT_SEND_ADDRESS, address)
+  },
+  [INPUT_SEND_AMOUNT]({
+    commit
+  }, amount) {
+    commit(INPUT_SEND_AMOUNT, amount)
+  },
   [ACCOUNT_SIGN_IN]({
     commit,
     state
@@ -61,9 +76,10 @@ const actions = {
       eth_account_unlock(state.user_address, state.user_password)
       commit(SIGNIN_SUCCESSED)
       commit(ACCOUNT_CREATED)
-      eth_get_data(firebase.auth().currentUser.photoURL, contract_address).then(result => {
+      eth_get_htcBalance(firebase.auth().currentUser.photoURL, eth_getCont_address).then(result => {
         commit(HTC_GET_BALANCE, result)
       })
+      firebase_make_map(state.user_id, state.user_address)
     })
   },
   [ACCOUNT_SIGN_OUT]({
@@ -97,8 +113,14 @@ const actions = {
   [HTC_GET_BALANCE]({
     commit
   }) {
-    balance = eth_get_data(state.user_address, contract_address)
+    balance = eth_get_htcBalance(state.user_address, eth_getCont_address)
     commit(HTC_GET_BALANCE(balance))
+  },
+  [HTC_SEND]({
+    commit,
+    state
+  }) {
+    eth_send(state.send_address, state.send_amount)
   }
 }
 
@@ -130,6 +152,12 @@ const mutations = {
   [INPUT_PASSWORD](state, password) {
     state.user_password = password
   },
+  [INPUT_SEND_ADDRESS](state, address) {
+    state.send_address = address
+  },
+  [INPUT_SEND_AMOUNT](state, amount) {
+    state.send_amount = amount
+  },
   [SIGNIN_SUCCESSED](state) {
     state.isSignIn = true
     state.user_id = firebase.auth().currentUser.displayName
@@ -154,6 +182,9 @@ const mutations = {
   },
   [HTC_GET_BALANCE](state, balance) {
     state.user_balance = balance
+  },
+  [HTC_SEND]() {
+
   }
 }
 
@@ -242,6 +273,15 @@ function firebase_account_create(id, password, address) {
   })
 }
 
+function firebase_make_map(id, address) {
+  firebase
+    .database()
+    .ref("/map/" + id)
+    .set({
+      address: address
+    });
+}
+
 function eth_account_create(id, password) {
   return new Promise((resolve, reject) => {
     axios({
@@ -278,7 +318,7 @@ function eth_account_unlock(address, password) {
     });
 }
 
-function eth_get_data(address, contract_address) {
+function eth_get_htcBalance(address, eth_getCont_address) {
   return new Promise((resolve, reject) => {
     axios({
         method: "POST",
@@ -288,8 +328,8 @@ function eth_get_data(address, contract_address) {
           method: "eth_call",
           params: [{
               from: address,
-              to: contract_address,
-              data: htc_getBalance(address)
+              to: eth_getCont_address,
+              data: eth_getCont_hexAddress(address)
             },
             "latest"
           ]
@@ -302,5 +342,29 @@ function eth_get_data(address, contract_address) {
       .catch(res => {
         console.error(res);
       });
+  })
+}
+
+function eth_send(address, amount) {
+  return new Promise((resolve, reject) => {
+    var refstring = "/map/" + address + "/address";
+    console.log(refstring);
+    var dbref = firebase
+      .database()
+      .ref(refstring);
+    dbref.on(
+      "value",
+      function (snapshot) {
+        console.log(snapshot.val());
+        if (snapshot.val() == null) {
+          eth_address = null;
+          alert("存在しないアドレスです");
+          exit;
+        } else eth_address = snapshot.val();
+      },
+      function (errorObject) {
+        console.log("The read failed: " + errorObject.code);
+      }
+    );
   })
 }
