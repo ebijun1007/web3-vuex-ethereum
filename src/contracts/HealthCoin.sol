@@ -1,288 +1,212 @@
 pragma solidity ^0.4.18;
 
-/**
- * @title SafeMath
- * @dev Math operations with safety checks that throw on error
- */
-library SafeMath {
-  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-    if (a == 0) {
-    return 0;
-  }
-    uint256 c = a * b;
-    assert(c / a == b);
-    return c;
-  }
+contract HealthCoin {
 
-  function div(uint256 a, uint256 b) internal pure returns (uint256) {
-    // assert(b > 0); // Solidity automatically throws when dividing by 0
-    uint256 c = a / b;
-    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-    return c;
-  }
+  // トークンのメタ情報を設定 (一部のウォレットが利用)
+  string public name = 'HealthCoin';
+  string public symbol = 'HTC';
+  uint public decimals = 0;
 
-  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-    assert(b <= a);
-    return a - b;
-  }
+  // トークンの合計供給量を保持
+  uint public totalSupply;
 
-  function add(uint256 a, uint256 b) internal pure returns (uint256) {
-    uint256 c = a + b;
-    assert(c >= a);
-    return c;
-  }
-}
-
-/**
- * @title ERC20Basic
- * @dev Simpler version of ERC20 interface
- */
-contract ERC20Basic {
-  uint256 public totalSupply;
-  function balanceOf(address who) constant returns (uint256);
-  function transfer(address to, uint256 value) returns (bool);
-  event Transfer(address indexed from, address indexed to, uint256 value);
-}
-
-/**
- * @title ERC20 interface
- */
-contract ERC20 is ERC20Basic {
-  function allowance(address owner, address spender) constant returns (uint256);
-  function transferFrom(address from, address to, uint256 value) returns (bool);
-  function approve(address spender, uint256 value) returns (bool);
-  event Approval(address indexed owner, address indexed spender, uint256 value);
-}
-
-/**
- * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control
- * functions, this simplifies the implementation of "user permissions".
- */
-contract Ownable {
-  address public owner;
-
-  event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+  // 各アカウントの残高を保持
+  mapping(address => uint) public balances;
 
   /**
-   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
-   * account.
+  * コントラクトを初期化
+  */
+  function HealthCoin() public {
+    uint _initialSupply = 21000000;
+
+    balances[msg.sender] = _initialSupply;
+    totalSupply = _initialSupply;
+  }
+
+  /**
+   * トークンの合計供給量を取得
+   * @return トークンの合計供給量を表す uint 値
    */
-  function Ownable() {
-    owner = msg.sender;
+  function totalSupply() public view returns (uint) {
+    return (totalSupply);
   }
 
   /**
-   * @dev Throws if called by any account other than the owner.
-   */
-  modifier onlyOwner() {
-    require(msg.sender == owner);
-    _;
+  * _owner アカウントの残高を取得
+  * @param _owner 残高を取得するアカウントのアドレス
+  * @return 渡されたアドレスが所有する残高を表す uint 値
+  */
+  function balanceOf(address _owner) public view returns (uint) {
+    return (balances[_owner]);
   }
 
   /**
-   * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to.
-   */
-  function transferOwnership(address newOwner) onlyOwner public {
-    require(newOwner != address(0));
-    OwnershipTransferred(owner, newOwner);
-    owner = newOwner;
-  }
-}
-
-/**
- * @title Basic token
- * @dev Basic version of StandardToken, with no allowances.
- */
-contract BasicToken is ERC20Basic {
-  using SafeMath for uint256;
-
-  mapping(address => uint256) balances;
-
-  /**
-  * @dev transfer token for a specified address
-  * @param _to The address to transfer to.
-  * @param _value The amount to be transferred.
+  * msg.sender が _to アカウントに指定した量のトークンを転送
+  * @param _to トークンを転送するアカウントのアドレス
+  * @param _value 転送するトークンの量
+  * @return トークンの転送が成功したかどうかを表す bool 値
   */
   function transfer(address _to, uint256 _value) public returns (bool) {
-    require(_to != address(0));
+    require(_value <= balances[msg.sender]);
 
-    // SafeMath.sub will throw if there is not enough balance.
-    balances[msg.sender] = balances[msg.sender].sub(_value);
-    balances[_to] = balances[_to].add(_value);
+    balances[msg.sender] -= _value;
+    balances[_to] += _value;
+
     Transfer(msg.sender, _to, _value);
     return true;
   }
 
-  /**
-  * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of.
-  * @return An uint256 representing the amount owned by the passed address.
-  */
-  function balanceOf(address _owner) public constant returns (uint256 balance) {
-    return balances[_owner];
-  }
-}
-
-/**
- * @title Standard ERC20 token
- * @dev Implementation of the basic standard token.
- */
-contract StandardToken is ERC20, BasicToken {
-
-  mapping (address => mapping (address => uint256)) allowed;
+  event Transfer(address indexed from, address indexed to, uint value);
+  
+    // 各アカウントによる転送を許可したトークンの量を保持
+  mapping(address => mapping (address => uint)) internal allowed;
 
   /**
-   * @dev Transfer tokens from one address to another
-   * @param _from address The address which you want to send tokens from
-   * @param _to address The address which you want to transfer to
-   * @param _value uint256 the amount of tokens to be transferred
+   * _from アカウントから _to アカウントに指定した量のトークンを転送
+   * @param _from トークンの転送元アドレス
+   * @param _to address トークンの転送先アドレス
+   * @param _value 転送するトークンの量
+   * @return トークンの転送が成功したかどうかを表す bool 値
    */
-  function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
-    require(_to != address(0));
+  function transferFrom(address _from, address _to, uint _value) public returns (bool) {
+    require(_value <= balances[_from]);
+    require(_value <= allowed[_from][msg.sender]);
 
-    uint256 _allowance = allowed[_from][msg.sender];
+    balances[_from] -= _value;
+    balances[_to] += _value;
+    allowed[_from][msg.sender] -= _value;
 
-    // Check is not needed because sub(_allowance, _value) will already throw if this condition is not met
-    // require (_value <= _allowance);
-
-    balances[_from] = balances[_from].sub(_value);
-    balances[_to] = balances[_to].add(_value);
-    allowed[_from][msg.sender] = _allowance.sub(_value);
     Transfer(_from, _to, _value);
     return true;
   }
 
   /**
-   * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
-   *
-   * Beware that changing an allowance with this method brings the risk that someone may use both the old
-   * and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this
-   * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:
-   * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-   * @param _spender The address which will spend the funds.
-   * @param _value The amount of tokens to be spent.
+   * msg.sender が _spender アカウントが指定した量のトークンを転送することを承認
+   * @param _spender トークンを転送したいアドレス
+   * @param _value 転送を許可するトークンの量
    */
-  function approve(address _spender, uint256 _value) public returns (bool) {
+  function approve(address _spender, uint _value) public returns (bool) {
     allowed[msg.sender][_spender] = _value;
+
     Approval(msg.sender, _spender, _value);
     return true;
   }
 
   /**
-   * @dev Function to check the amount of tokens that an owner allowed to a spender.
-   * @param _owner address The address which owns the funds.
-   * @param _spender address The address which will spend the funds.
-   * @return A uint256 specifying the amount of tokens still available for the spender.
+   * _spender アカウントが _owner アカウントから転送できるトークンの量を取得
+   * @param _owner トークンを所持するアドレス
+   * @param _spender トークンを転送したいアドレス
+   * @return _spender アカウントが _owner アカウントから転送可能なトークンの量を表す uint の値
    */
-  function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
+  function allowance(address _owner, address _spender) public view returns (uint) {
     return allowed[_owner][_spender];
   }
 
-  /**
-   * approve should be called when allowed[_spender] == 0. To increment
-   * allowed value is better to use this function to avoid 2 calls (and wait until
-   * the first transaction is mined)
-   * From MonolithDAO Token.sol
-   */
-  function increaseApproval (address _spender, uint _addedValue)
-    returns (bool success) {
-    allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
-    Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-    return true;
-  }
+  event Approval(address indexed owner, address indexed spender, uint value);
+  pragma solidity ^0.4.18;
 
-  function decreaseApproval (address _spender, uint _subtractedValue)
-    returns (bool success) {
-    uint oldValue = allowed[msg.sender][_spender];
-    if (_subtractedValue > oldValue) {
-      allowed[msg.sender][_spender] = 0;
-    } else {
-      allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
-    }
-    Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-    return true;
-  }
-}
+contract HealthCoin {
 
-/**
- * @title Burnable Token
- * @dev Token that can be irreversibly burned (destroyed).
- */
-contract BurnableToken is StandardToken {
+  // トークンのメタ情報を設定 (一部のウォレットが利用)
+  string public name = 'HealthCoin';
+  string public symbol = 'HTC';
+  uint public decimals = 0;
+
+  // トークンの合計供給量を保持
+  uint public totalSupply;
+
+  // 各アカウントの残高を保持
+  mapping(address => uint) public balances;
 
   /**
-   * @dev Burns a specific amount of tokens.
-   * @param _value The amount of token to be burned.
-   */
-  function burn(uint _value)
-    public
-  {
-    require(_value > 0);
-
-    address burner = msg.sender;
-    balances[burner] = balances[burner].sub(_value);
-    totalSupply = totalSupply.sub(_value);
-    Burn(burner, _value);
-  }
-
-  event Burn(address indexed burner, uint indexed value);
-}
-
-/**
- * @title Mintable token
- * @dev Simple ERC20 Token example, with mintable token creation
- * @dev Issue: * https://github.com/OpenZeppelin/zeppelin-solidity/issues/120
- * Based on code by TokenMarketNet: https://github.com/TokenMarketNet/ico/blob/master/contracts/MintableToken.sol
- */
-contract MintableToken is StandardToken, Ownable {
-  event Mint(address indexed to, uint256 amount);
-  event MintFinished();
-
-  bool public mintingFinished = false;
-
-
-  modifier canMint() {
-    require(!mintingFinished);
-    _;
-  }
-
-  /**
-   * @dev Function to mint tokens
-   * @param _to The address that will receive the minted tokens.
-   * @param _amount The amount of tokens to mint.
-   * @return A boolean that indicates if the operation was successful.
-   */
-  function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
-    totalSupply = totalSupply.add(_amount);
-    balances[_to] = balances[_to].add(_amount);
-    Mint(_to, _amount);
-    Transfer(0x0, _to, _amount);
-    return true;
-  }
-
-  /**
-   * @dev Function to stop minting new tokens.
-   * @return True if the operation was successful.
-   */
-  function finishMinting() onlyOwner public returns (bool) {
-    mintingFinished = true;
-    MintFinished();
-    return true;
-  }
-}
-
-contract HealthCoin is MintableToken, BurnableToken {
-
-  string public constant name = 'HealthCoin';
-  string public constant symbol = 'HTC';
-  uint8 public constant decimals = 0;
-  uint256 public constant InitialSupply = 21e6;
-  uint256 public totalSupply;
-
+  * コントラクトを初期化
+  */
   function HealthCoin() public {
-    totalSupply=InitialSupply;
-    balances[msg.sender]=InitialSupply;
+    uint _initialSupply = 21000000;
+
+    balances[msg.sender] = _initialSupply;
+    totalSupply = _initialSupply;
   }
+
+  /**
+   * トークンの合計供給量を取得
+   * @return トークンの合計供給量を表す uint 値
+   */
+  function totalSupply() public view returns (uint) {
+    return (totalSupply);
+  }
+
+  /**
+  * _owner アカウントの残高を取得
+  * @param _owner 残高を取得するアカウントのアドレス
+  * @return 渡されたアドレスが所有する残高を表す uint 値
+  */
+  function balanceOf(address _owner) public view returns (uint) {
+    return (balances[_owner]);
+  }
+
+  /**
+  * msg.sender が _to アカウントに指定した量のトークンを転送
+  * @param _to トークンを転送するアカウントのアドレス
+  * @param _value 転送するトークンの量
+  * @return トークンの転送が成功したかどうかを表す bool 値
+  */
+  function transfer(address _to, uint256 _value) public returns (bool) {
+    require(_value <= balances[msg.sender]);
+
+    balances[msg.sender] -= _value;
+    balances[_to] += _value;
+
+    Transfer(msg.sender, _to, _value);
+    return true;
+  }
+
+  event Transfer(address indexed from, address indexed to, uint value);
+  
+    // 各アカウントによる転送を許可したトークンの量を保持
+  mapping(address => mapping (address => uint)) internal allowed;
+
+  /**
+   * _from アカウントから _to アカウントに指定した量のトークンを転送
+   * @param _from トークンの転送元アドレス
+   * @param _to address トークンの転送先アドレス
+   * @param _value 転送するトークンの量
+   * @return トークンの転送が成功したかどうかを表す bool 値
+   */
+  function transferFrom(address _from, address _to, uint _value) public returns (bool) {
+    require(_value <= balances[_from]);
+    require(_value <= allowed[_from][msg.sender]);
+
+    balances[_from] -= _value;
+    balances[_to] += _value;
+    allowed[_from][msg.sender] -= _value;
+
+    Transfer(_from, _to, _value);
+    return true;
+  }
+
+  /**
+   * msg.sender が _spender アカウントが指定した量のトークンを転送することを承認
+   * @param _spender トークンを転送したいアドレス
+   * @param _value 転送を許可するトークンの量
+   */
+  function approve(address _spender, uint _value) public returns (bool) {
+    allowed[msg.sender][_spender] = _value;
+
+    Approval(msg.sender, _spender, _value);
+    return true;
+  }
+
+  /**
+   * _spender アカウントが _owner アカウントから転送できるトークンの量を取得
+   * @param _owner トークンを所持するアドレス
+   * @param _spender トークンを転送したいアドレス
+   * @return _spender アカウントが _owner アカウントから転送可能なトークンの量を表す uint の値
+   */
+  function allowance(address _owner, address _spender) public view returns (uint) {
+    return allowed[_owner][_spender];
+  }
+
+  event Approval(address indexed owner, address indexed spender, uint value);
+  
 }

@@ -337,3 +337,7 @@ export function eth_getCont_hexAddress(_address) {
   const eth_getCoinBalance = "0x70a08231000000000000000000000000" + address;
   return eth_getCoinBalance;
 }
+
+export function eth_sendCont_hexAddress(_address) {
+
+}

@@ -120,7 +120,8 @@ const actions = {
     commit,
     state
   }) {
-    eth_send(state.send_address, state.send_amount)
+    address = eth_get_sendAddress(state.send_address, state.send_amount)
+
   }
 }
 
@@ -345,10 +346,9 @@ function eth_get_htcBalance(address, eth_getCont_address) {
   })
 }
 
-function eth_send(address, amount) {
+function eth_get_sendAddress(address) {
   return new Promise((resolve, reject) => {
     var refstring = "/map/" + address + "/address";
-    console.log(refstring);
     var dbref = firebase
       .database()
       .ref(refstring);
@@ -359,12 +359,19 @@ function eth_send(address, amount) {
         if (snapshot.val() == null) {
           eth_address = null;
           alert("存在しないアドレスです");
-          exit;
-        } else eth_address = snapshot.val();
+          reject();
+        } else resolve(snapshot.val());
       },
       function (errorObject) {
         console.log("The read failed: " + errorObject.code);
+        reject();
       }
     );
+  })
+}
+
+function eth_send_htc(from, to, amount) {
+  return new Promise((resolve, reject) => {
+
   })
 }
