@@ -4,9 +4,11 @@ import axios from "axios"
 import firebase from "firebase"
 import Router from 'vue-router'
 import {
-  eth_getCont_address,
-  eth_getCont_hexAddress
-} from "../contracts/HealthCoin.js"
+  contract_address,
+  eth_getCont_hexAddress,
+  eth_createCont_hexAddress,
+  eth_sendCont_hexAddress
+} from "../contracts/originalCoin.js"
 
 Vue.use(Router)
 Vue.use(Vuex)
@@ -73,10 +75,10 @@ const actions = {
     state
   }) {
     firebase_signin(state.user_id, state.user_password).then(results => {
-      eth_account_unlock(state.user_address, state.user_password)
+      eth_account_unlock(firebase.auth().currentUser.photoURL, state.user_password)
       commit(SIGNIN_SUCCESSED)
       commit(ACCOUNT_CREATED)
-      eth_get_htcBalance(firebase.auth().currentUser.photoURL, eth_getCont_address).then(result => {
+      eth_get_htcBalance(firebase.auth().currentUser.photoURL, contract_address).then(result => {
         commit(HTC_GET_BALANCE, result)
       })
       firebase_make_map(state.user_id, state.user_address)
@@ -113,15 +115,16 @@ const actions = {
   [HTC_GET_BALANCE]({
     commit
   }) {
-    balance = eth_get_htcBalance(state.user_address, eth_getCont_address)
+    balance = eth_get_htcBalance(state.user_address, contract_address)
     commit(HTC_GET_BALANCE(balance))
   },
   [HTC_SEND]({
     commit,
     state
   }) {
-    address = eth_get_sendAddress(state.send_address, state.send_amount)
-
+    eth_get_sendAddress(state.send_address).then(result => {
+      eth_send_htc(state.user_address, result, state.send_amount)
+    })
   }
 }
 
@@ -319,7 +322,7 @@ function eth_account_unlock(address, password) {
     });
 }
 
-function eth_get_htcBalance(address, eth_getCont_address) {
+function eth_get_htcBalance(address, contract_address) {
   return new Promise((resolve, reject) => {
     axios({
         method: "POST",
@@ -329,7 +332,7 @@ function eth_get_htcBalance(address, eth_getCont_address) {
           method: "eth_call",
           params: [{
               from: address,
-              to: eth_getCont_address,
+              to: contract_address,
               data: eth_getCont_hexAddress(address)
             },
             "latest"
@@ -372,6 +375,29 @@ function eth_get_sendAddress(address) {
 
 function eth_send_htc(from, to, amount) {
   return new Promise((resolve, reject) => {
-
+    axios({
+        method: "POST",
+        url: "http://localhost:8501",
+        data: {
+          id: "1",
+          method: "eth_call",
+          params: [{
+              // from: '"' + from + '"',
+              // from: from,
+              // to: contract_address.toString(16),
+              // value: (amount.toString(16)),
+              data: eth_sendCont_hexAddress(from, to, amount)
+            },
+            "latest"
+          ]
+        }
+      })
+      .then(res => {
+        console.log(res);
+        resolve(parseInt(res.data.result, 16));
+      })
+      .catch(res => {
+        console.error(res);
+      });
   })
 }

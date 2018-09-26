@@ -331,6 +331,7 @@ export const abi = [
   }]
 ]
 export const eth_getCont_address = "0xa6c624595c5ac7fc6bb418d57810f3b864030973"
+export const eth_sendCont_address = "0xa6c624595c5ac7fc6bb418d57810f3b864030973"
 
 export function eth_getCont_hexAddress(_address) {
   var address = _address.slice(2);
@@ -338,6 +339,12 @@ export function eth_getCont_hexAddress(_address) {
   return eth_getCoinBalance;
 }
 
-export function eth_sendCont_hexAddress(_address) {
 
+export function eth_sendCont_hexAddress(from, to, amount) {
+  var from = from.slice(2);
+  var to = to.slice(2);
+  var length = amount.length;
+  var eth_sendCoinBalace = "0x23b872dd000000000000000000000000" + from + "000000000000000000000000" + to + "0000000000000000000000000000000000000000000000000000000000000000";
+  eth_sendCoinBalace = eth_sendCoinBalace.slice(0, -length);
+  eth_sendCoinBalace = eth_sendCoinBalace + amount.toString(16);
 }
