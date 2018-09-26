@@ -10,11 +10,22 @@
             <div text-align=left>
             <table>
             <tr> <td>To:</td><td><input @change="INPUT_SEND_ADDRESS($event.target.value)" type="text" size ="60" placeholder="destination address" v-model="dest_address"></td></tr><br>
-            <tr> <td>Amount:</td><td><input @change="INPUT_SEND_AMOUNT($event.target.value)" type="text" size ="10"  placeholder="10" v-model="amount"></td></tr><br>
+            <tr> <td>Amount:</td><td><input @change="INPUT_SEND_AMOUNT($event.target.value)" type="text" size ="10"  placeholder="10" v-model="send_amount"></td></tr><br>
             </table>
             <button @click="HTC_SEND">Send HTC</button>
             </div>
         </div>
+
+        <div align="center">
+            <h1> Get HealthCoin </h1>
+            <div text-align=left>
+            <table>
+            <tr> <td>Amount:</td><td><input @change="INPUT_GET_AMOUNT($event.target.value)" type="text" size ="10"  placeholder="10" v-model="get_amount"></td></tr><br>
+            </table>
+            <button @click="HTC_GET">Get HTC</button>
+            </div>
+        </div>
+
         <br><br>
         <button @click="ACCOUNT_SIGN_OUT ">Sign out</button>
         </template>
@@ -28,8 +39,10 @@ import SignIn from "./SignIn";
 import {
   ACCOUNT_SIGN_OUT,
   HTC_SEND,
+  HTC_GET,
   INPUT_SEND_ADDRESS,
-  INPUT_SEND_AMOUNT
+  INPUT_SEND_AMOUNT,
+  INPUT_GET_AMOUNT
 } from "../vuex/mutation-types";
 import firebase from "firebase";
 
@@ -37,7 +50,8 @@ export default {
   data() {
     return {
       dest_address: "",
-      amount: "",
+      send_amount: "",
+      get_amount: "",
       password: ""
     };
   },
@@ -53,8 +67,10 @@ export default {
     ...mapActions([
       ACCOUNT_SIGN_OUT,
       HTC_SEND,
+      HTC_GET,
       INPUT_SEND_ADDRESS,
-      INPUT_SEND_AMOUNT
+      INPUT_SEND_AMOUNT,
+      INPUT_GET_AMOUNT
     ])
   }
 };

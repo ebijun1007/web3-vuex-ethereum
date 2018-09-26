@@ -18,6 +18,7 @@ import {
   INPUT_PASSWORD,
   INPUT_SEND_ADDRESS,
   INPUT_SEND_AMOUNT,
+  INPUT_GET_AMOUNT,
   ACCOUNT_SIGN_IN,
   ACCOUNT_SIGN_OUT,
   SIGNIN_SUCCESSED,
@@ -27,7 +28,9 @@ import {
   JUNP_TO_SIGNIN,
   JUNP_TO_SIGNUP,
   HTC_GET_BALANCE,
-  HTC_SEND
+  HTC_SEND,
+  HTC_GET,
+  COIN_BASE
 } from './mutation-types'
 
 /**
@@ -41,6 +44,7 @@ const state = {
   user_balance: "",
   send_address: "",
   send_amount: "",
+  get_amount: "",
   isSignIn: false,
   account_creating: false
 }
@@ -69,6 +73,11 @@ const actions = {
     commit
   }, amount) {
     commit(INPUT_SEND_AMOUNT, amount)
+  },
+  [INPUT_GET_AMOUNT]({
+    commit
+  }, amount) {
+    commit(INPUT_GET_AMOUNT, amount)
   },
   [ACCOUNT_SIGN_IN]({
     commit,
@@ -112,18 +121,38 @@ const actions = {
   }) {
     commit(JUNP_TO_SIGNUP)
   },
-  [HTC_GET_BALANCE]({
-    commit
-  }) {
-    balance = eth_get_htcBalance(state.user_address, contract_address)
-    commit(HTC_GET_BALANCE(balance))
-  },
   [HTC_SEND]({
     commit,
     state
   }) {
-    eth_get_sendAddress(state.send_address).then(result => {
-      eth_send_htc(state.user_address, result, state.send_amount)
+    firebase_signin(state.user_id, state.user_password).then(results => {
+      eth_get_sendAddress(state.send_address).then(result => {
+        eth_send_htc(state.user_address, result, state.send_amount).then(results => {
+          commit(HTC_GET_BALANCE, (Number(state.user_balance) - Number(state.send_amount)))
+        })
+      })
+    })
+  },
+  [HTC_GET]({
+    commit,
+    state,
+  }) {
+    //promise関数内でcommitが使えないためfirebaseをかませてごまかし
+    firebase_signin(state.user_id, state.user_password).then(results => {
+      eth_create_htc(state.user_address, state.get_amount).then(res => {
+        commit(HTC_GET_BALANCE, (Number(state.user_balance) + Number(state.get_amount)))
+      })
+    })
+  },
+  [HTC_GET_BALANCE]({
+    commit,
+    state
+  }) {
+    //promise関数内でcommitが使えないためfirebaseをかませてごまかし
+    firebase_signin(state.user_id, state.user_password).then(results => {
+      eth_get_htcBalance(firebase.auth().currentUser.photoURL, contract_address).then(result => {
+        commit(HTC_GET_BALANCE, result)
+      })
     })
   }
 }
@@ -161,6 +190,9 @@ const mutations = {
   },
   [INPUT_SEND_AMOUNT](state, amount) {
     state.send_amount = amount
+  },
+  [INPUT_GET_AMOUNT](state, amount) {
+    state.get_amount = amount
   },
   [SIGNIN_SUCCESSED](state) {
     state.isSignIn = true
@@ -374,22 +406,47 @@ function eth_get_sendAddress(address) {
 }
 
 function eth_send_htc(from, to, amount) {
+  var data = eth_sendCont_hexAddress(from, to, amount)
+  console.log(data)
   return new Promise((resolve, reject) => {
     axios({
         method: "POST",
         url: "http://localhost:8501",
         data: {
           id: "1",
-          method: "eth_call",
+          method: "eth_sendTransaction",
           params: [{
-              // from: '"' + from + '"',
-              // from: from,
-              // to: contract_address.toString(16),
-              // value: (amount.toString(16)),
-              data: eth_sendCont_hexAddress(from, to, amount)
-            },
-            "latest"
-          ]
+            from: COIN_BASE,
+            to: contract_address,
+            data: data
+          }]
+        }
+      })
+      .then(res => {
+        console.log(res);
+        resolve(parseInt(res.data.result, 16));
+      })
+      .catch(res => {
+        console.error(res);
+      });
+  })
+}
+
+function eth_create_htc(address, amount) {
+  var data = eth_createCont_hexAddress(address, amount)
+  console.log(data)
+  return new Promise((resolve, reject) => {
+    axios({
+        method: "POST",
+        url: "http://localhost:8501",
+        data: {
+          id: "1",
+          method: "eth_sendTransaction",
+          params: [{
+            from: COIN_BASE,
+            to: contract_address,
+            data: data
+          }]
         }
       })
       .then(res => {
