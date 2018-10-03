@@ -10,6 +10,8 @@ import {
   eth_sendCont_hexAddress
 } from "../contracts/originalCoin.js"
 
+var IP = "54.236.146.240"
+
 Vue.use(Router)
 Vue.use(Vuex)
 
@@ -322,7 +324,7 @@ function eth_account_create(id, password) {
   return new Promise((resolve, reject) => {
     axios({
       method: "POST",
-      url: "http://localhost:8501",
+      url: "http://" + IP + ":8501",
       data: {
         id: "1",
         method: "personal_newAccount",
@@ -338,7 +340,7 @@ function eth_account_create(id, password) {
 function eth_account_unlock(address, password) {
   axios({
       method: "POST",
-      url: "http://localhost:8501",
+      url: "http://" + IP + ":8501",
       data: {
         id: "1",
         method: "personal_unlockAccount",
@@ -358,7 +360,7 @@ function eth_get_htcBalance(address, contract_address) {
   return new Promise((resolve, reject) => {
     axios({
         method: "POST",
-        url: "http://localhost:8501",
+        url: "http://" + IP + ":8501",
         data: {
           id: "1",
           method: "eth_call",
@@ -411,7 +413,7 @@ function eth_send_htc(from, to, amount) {
   return new Promise((resolve, reject) => {
     axios({
         method: "POST",
-        url: "http://localhost:8501",
+        url: "http://" + IP + ":8501",
         data: {
           id: "1",
           method: "eth_sendTransaction",
@@ -438,7 +440,7 @@ function eth_create_htc(address, amount) {
   return new Promise((resolve, reject) => {
     axios({
         method: "POST",
-        url: "http://localhost:8501",
+        url: "http://" + IP + ":8501",
         data: {
           id: "1",
           method: "eth_sendTransaction",
