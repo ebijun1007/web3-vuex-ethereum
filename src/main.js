@@ -5,8 +5,12 @@ import App from './App'
 import router from './router'
 import store from './vuex/store.js'
 import firebase from 'firebase'
+import ElementUI from 'element-ui'
+import locale from 'element-ui/lib/locale/lang/ja'
+import 'element-ui/lib/theme-chalk/index.css'
 
 Vue.config.productionTip = false
+Vue.use(ElementUI, { locale })
 
 /* eslint-disable no-new */
 new Vue({
@@ -29,3 +33,5 @@ var config = {
   messagingSenderId: "342036996355"
 };
 firebase.initializeApp(config);
+
+

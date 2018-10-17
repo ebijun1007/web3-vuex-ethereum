@@ -24,5 +24,8 @@ export const HTC_SEND = "HTC_SEND"
 export const HTC_GET = "HTC_GET"
 export const HTC_GET_BALANCE = "HTC_GET_BALANCE"
 
-//ブロックチェーン系
-export const COIN_BASE = "0x776b691966896aeeb7311366daf564e70e80a8c7"
+//fitbit
+export const ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMkQ5NDgiLCJzdWIiOiI2WDU1OTgiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyc29jIHJhY3QgcnNldCBybG9jIHJ3ZWkgcmhyIHJwcm8gcm51dCByc2xlIiwiZXhwIjoxNTM5ODU1OTMxLCJpYXQiOjE1Mzk2NzMzNDZ9.PxYOhz7dFnOXADcohRU2e8VJWoLiL6o_A4H3jnRYsVQ"
+export const GET_DAILY_SUMMARY = "GET_DAILY_SUMMARY"
+export const GOALS = "GOALS"
+export const SUMMALY = "SUMMARY"

@@ -8,6 +8,7 @@
         <p>You don't have an account? 
             <button @click="JUNP_TO_SIGNUP">Create Account</button>
         </p>
+
     </div>
 </template>
 
@@ -21,7 +22,8 @@ import {
   INPUT_ID,
   INPUT_PASSWORD,
   CHANGE_PROFILES,
-  JUNP_TO_SIGNUP
+  JUNP_TO_SIGNUP,
+  GET_DAILY_SUMMARY
 } from "../vuex/mutation-types";
 
 export default {
@@ -31,7 +33,8 @@ export default {
       ACCOUNT_SIGN_UP,
       INPUT_ID,
       INPUT_PASSWORD,
-      JUNP_TO_SIGNUP
+      JUNP_TO_SIGNUP,
+      GET_DAILY_SUMMARY
     ])
   }
 };

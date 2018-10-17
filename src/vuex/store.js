@@ -1,16 +1,12 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
 import axios from "axios"
-import firebase from "firebase"
 import Router from 'vue-router'
-import {
-  contract_address,
-  eth_getCont_hexAddress,
-  eth_createCont_hexAddress,
-  eth_sendCont_hexAddress
-} from "../contracts/originalCoin.js"
-
-var IP = "54.236.146.240"
+import firebase from "firebase"
+import * as contract from "../contracts/originalCoin.js"
+import * as eth from './eth_functions.js'
+import * as fitbit from './fitbit_functions.js'
+import * as fb from './firebase_functions.js'
 
 Vue.use(Router)
 Vue.use(Vuex)
@@ -32,7 +28,10 @@ import {
   HTC_GET_BALANCE,
   HTC_SEND,
   HTC_GET,
-  COIN_BASE
+  ACCESS_TOKEN,
+  GET_DAILY_SUMMARY,
+  GOALS,
+  SUMMARY
 } from './mutation-types'
 
 /**
@@ -48,7 +47,9 @@ const state = {
   send_amount: "",
   get_amount: "",
   isSignIn: false,
-  account_creating: false
+  account_creating: false,
+  goals: "",
+  summary: ""
 }
 
 /**
@@ -85,27 +86,30 @@ const actions = {
     commit,
     state
   }) {
-    firebase_signin(state.user_id, state.user_password).then(results => {
-      eth_account_unlock(firebase.auth().currentUser.photoURL, state.user_password)
+    fb.signin(state.user_id, state.user_password).then(results => {
+      eth.account_unlock(firebase.auth().currentUser.photoURL, state.user_password)
       commit(SIGNIN_SUCCESSED)
       commit(ACCOUNT_CREATED)
-      eth_get_htcBalance(firebase.auth().currentUser.photoURL, contract_address).then(result => {
+      eth.get_htcBalance(firebase.auth().currentUser.photoURL, contract.address).then(result => {
         commit(HTC_GET_BALANCE, result)
+      }),
+      fitbit.getInfo().then(results => {
+        commit(GET_DAILY_SUMMARY,results.data)
       })
-      firebase_make_map(state.user_id, state.user_address)
+      fb.make_map(state.user_id, state.user_address)
     })
   },
   [ACCOUNT_SIGN_OUT]({
     commit
   }) {
-    firebase_signout();
+    fb.signout();
     commit(SIGNIN_CLOSED)
   },
   [ACCOUNT_SIGN_UP]({
     commit,
   }) {
-    eth_account_create(state.user_id, state.user_password).then(results => {
-      firebase_account_create(results[0], results[1], results[2]).then(results => {})
+    eth.account_create(state.user_id, state.user_password).then(results => {
+      fb.account_create(results[0], results[1], results[2]).then(results => {})
     })
   },
   [ACCOUNT_CREATED]({
@@ -127,9 +131,9 @@ const actions = {
     commit,
     state
   }) {
-    firebase_signin(state.user_id, state.user_password).then(results => {
-      eth_get_sendAddress(state.send_address).then(result => {
-        eth_send_htc(state.user_address, result, state.send_amount).then(results => {
+    fb.signin(state.user_id, state.user_password).then(results => {
+      eth.get_sendAddress(state.send_address).then(result => {
+        eth.send_htc(state.user_address, result, state.send_amount).then(results => {
           commit(HTC_GET_BALANCE, (Number(state.user_balance) - Number(state.send_amount)))
         })
       })
@@ -140,8 +144,8 @@ const actions = {
     state,
   }) {
     //promise関数内でcommitが使えないためfirebaseをかませてごまかし
-    firebase_signin(state.user_id, state.user_password).then(results => {
-      eth_create_htc(state.user_address, state.get_amount).then(res => {
+    fb.signin(state.user_id, state.user_password).then(results => {
+      eth.create_htc(state.user_address, state.get_amount).then(res => {
         commit(HTC_GET_BALANCE, (Number(state.user_balance) + Number(state.get_amount)))
       })
     })
@@ -151,8 +155,8 @@ const actions = {
     state
   }) {
     //promise関数内でcommitが使えないためfirebaseをかませてごまかし
-    firebase_signin(state.user_id, state.user_password).then(results => {
-      eth_get_htcBalance(firebase.auth().currentUser.photoURL, contract_address).then(result => {
+    fb.signin(state.user_id, state.user_password).then(results => {
+      eth.get_htcBalance(firebase.auth().currentUser.photoURL, contract.address).then(result => {
         commit(HTC_GET_BALANCE, result)
       })
     })
@@ -173,7 +177,11 @@ const getters = {
   //サインイン状態(bool)
   signin_successed: state => state.isSignIn,
   //アカウント作成状態（bool)
-  account_creating: state => state.account_creating
+  account_creating: state => state.account_creating,
+  //fitbitの目標
+  goals: state => state.goals,
+  //fitbitの活動量
+  summary: state => state.summary,
 }
 
 /**
@@ -221,8 +229,9 @@ const mutations = {
   [HTC_GET_BALANCE](state, balance) {
     state.user_balance = balance
   },
-  [HTC_SEND]() {
-
+  [GET_DAILY_SUMMARY](state,data) {
+    state.goals = data.goals
+    state.summary = data.summary
   }
 }
 
@@ -236,227 +245,3 @@ export default new Vuex.Store({
   actions,
   mutations
 })
-
-/**
- * 自作ファンクション　アクションやミューテーションから呼び出したい関数を書く
- * @type {object}
- */
-//Functions
-
-/**
- * firebaseのサインイン機能
- * @param {id,password} num - 数値の引数
- */
-function firebase_signin(id, password) {
-  return new Promise((resolve, reject) => {
-    console.log("id:" + id, "pass:" + password)
-    firebase
-      .auth()
-      .signInWithEmailAndPassword(
-        id + "@example.com",
-        password
-      )
-      .then(
-        user => {
-          console.log("sign in")
-          resolve()
-        },
-        err => {
-          alert(err.message);
-        }
-      );
-  })
-}
-
-/**
- * firebaseのログアウト機能
- * @param 
- */
-function firebase_signout() {
-  firebase
-    .auth()
-    .signOut()
-    .then(() => {
-      console.log("sign out")
-    });
-}
-
-function firebase_account_create(id, password, address) {
-  return new Promise((resolve, reject) => {
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(
-        id + "@example.com",
-        password
-      )
-      .then(user => {
-        var user = firebase.auth().currentUser;
-        user
-          .updateProfile({
-            displayName: id,
-            email: id + "@example.com",
-            photoURL: address
-          })
-          .then(function () {
-            console.log(created)
-            resolve()
-          })
-          .catch(function (error) {
-            // An error happened.
-          });
-      })
-      .catch(error => {
-        alert(error.message);
-      });
-  })
-}
-
-function firebase_make_map(id, address) {
-  firebase
-    .database()
-    .ref("/map/" + id)
-    .set({
-      address: address
-    });
-}
-
-function eth_account_create(id, password) {
-  return new Promise((resolve, reject) => {
-    axios({
-      method: "POST",
-      url: "http://" + IP + ":8501",
-      data: {
-        id: "1",
-        method: "personal_newAccount",
-        params: [password]
-      }
-    }).then(res => {
-      console.log(res.data.result);
-      resolve([id, password, res.data.result]);
-    });
-  })
-}
-
-function eth_account_unlock(address, password) {
-  axios({
-      method: "POST",
-      url: "http://" + IP + ":8501",
-      data: {
-        id: "1",
-        method: "personal_unlockAccount",
-        params: [address, password]
-      }
-    })
-    .then(res => {
-      console.log(res);
-      console.log("unlocked");
-    })
-    .catch(res => {
-      console.error(res);
-    });
-}
-
-function eth_get_htcBalance(address, contract_address) {
-  return new Promise((resolve, reject) => {
-    axios({
-        method: "POST",
-        url: "http://" + IP + ":8501",
-        data: {
-          id: "1",
-          method: "eth_call",
-          params: [{
-              from: address,
-              to: contract_address,
-              data: eth_getCont_hexAddress(address)
-            },
-            "latest"
-          ]
-        }
-      })
-      .then(res => {
-        console.log("getBalanceOfHTC" + parseInt(res.data.result, 16));
-        resolve(parseInt(res.data.result, 16));
-      })
-      .catch(res => {
-        console.error(res);
-      });
-  })
-}
-
-function eth_get_sendAddress(address) {
-  return new Promise((resolve, reject) => {
-    var refstring = "/map/" + address + "/address";
-    var dbref = firebase
-      .database()
-      .ref(refstring);
-    dbref.on(
-      "value",
-      function (snapshot) {
-        console.log(snapshot.val());
-        if (snapshot.val() == null) {
-          eth_address = null;
-          alert("存在しないアドレスです");
-          reject();
-        } else resolve(snapshot.val());
-      },
-      function (errorObject) {
-        console.log("The read failed: " + errorObject.code);
-        reject();
-      }
-    );
-  })
-}
-
-function eth_send_htc(from, to, amount) {
-  var data = eth_sendCont_hexAddress(from, to, amount)
-  console.log(data)
-  return new Promise((resolve, reject) => {
-    axios({
-        method: "POST",
-        url: "http://" + IP + ":8501",
-        data: {
-          id: "1",
-          method: "eth_sendTransaction",
-          params: [{
-            from: COIN_BASE,
-            to: contract_address,
-            data: data
-          }]
-        }
-      })
-      .then(res => {
-        console.log(res);
-        resolve(parseInt(res.data.result, 16));
-      })
-      .catch(res => {
-        console.error(res);
-      });
-  })
-}
-
-function eth_create_htc(address, amount) {
-  var data = eth_createCont_hexAddress(address, amount)
-  console.log(data)
-  return new Promise((resolve, reject) => {
-    axios({
-        method: "POST",
-        url: "http://" + IP + ":8501",
-        data: {
-          id: "1",
-          method: "eth_sendTransaction",
-          params: [{
-            from: COIN_BASE,
-            to: contract_address,
-            data: data
-          }]
-        }
-      })
-      .then(res => {
-        console.log(res);
-        resolve(parseInt(res.data.result, 16));
-      })
-      .catch(res => {
-        console.error(res);
-      });
-  })
-}

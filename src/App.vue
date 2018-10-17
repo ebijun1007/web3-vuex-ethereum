@@ -4,7 +4,7 @@
       <SignIn/>
     </template>
     <template v-if="signin_successed == true && account_creating == false">
-      <Home/>
+      <Tab/>
     </template>
     <template v-if="signin_successed == false && account_creating == true">
       <SignUp/>
@@ -16,6 +16,8 @@
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import Home from "./components/Home";
+import Tab from "./components/Tab";
+
 
 import { mapGetters } from "vuex";
 export default {
@@ -26,7 +28,8 @@ export default {
   components: {
     SignIn,
     SignUp,
-    Home
+    Home,
+    Tab
   }
 };
 </script>
