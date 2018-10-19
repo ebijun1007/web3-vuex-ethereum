@@ -12,83 +12,109 @@
         <tbody>
         <tr>
           <td>Goals</td>
-          <td>{{ goals.activeMinutes }} </td>
-          <td>{{ goals.caloriesOut }} </td>
-          <td>{{ goals.distance }} </td>
-          <td>{{ goals.floors }} </td>
-          <td>{{ goals.steps }} </td>
+          <td id="goal1">{{ goals.activeMinutes }} </td>
+          <td id="goal2">{{ goals.caloriesOut }} </td>
+          <td id="goal3">{{ goals.distance }} </td>
+          <td id="goal4">{{ goals.floors }} </td>
+          <td id="goal5">{{ goals.steps }} </td>
         </tr>
         <tr>
           <td>Summary</td>
-          <td>{{ summary.fairlyActiveMinutes }} </td>
-          <td>{{ summary.caloriesOut }} </td>
-          <td>{{ summary.distances[0].distance }} </td>
-          <td>{{ summary.floors }} </td>
-          <td>{{ summary.steps }} </td>
+          <td id="summary1">{{ summary.fairlyActiveMinutes }} </td>
+          <td id="summary2">{{ summary.caloriesOut }} </td>
+          <td id="summary3">{{ summary.distances[0].distance }} </td>
+          <td id="summary4">{{ summary.floors }} </td>
+          <td id="summary5">{{ summary.steps }} </td>
         </tr>
         <tr>
           <td></td>
           <td v-for="button in buttons">
-            <el-button v-bind:disabled="button.isPushed" @click="changeFlag(button.id)" type="success" round>{{button.value}} </el-button>
+            <el-button v-bind:disabled="button.isActive" @click="changeFlag(button.id), achieveDone(button.id)" type="success" round>{{button.value}} </el-button>
           </td>
-          <!-- <td><el-button v-bind:disabled="value2.isPushed" @click="value2.changeValue()" type="success" round>{{value2.value}}</el-button></td>
-          <td><el-button v-bind:disabled="value3.isPushed" @click="value3.changeValue()" type="success" round>{{value3.value}}</el-button></td>
-          <td><el-button v-bind:disabled="value4.isPushed" @click="value4.changeValue()" type="success" round>{{value4.value}}</el-button></td>
-          <td><el-button v-bind:disabled="value5.isPushed" @click="value5.changeValue()" type="success" round>{{value5.value}}</el-button></td> -->
         </tr>
         </tbody>
       </table>
+      {{ flag1 }}
 
     </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-
-import {
-  GET_DAILY_SUMMARY
-} from "../vuex/mutation-types";
+import { mapActions } from "vuex";
+import { GET_DAILY_SUMMARY, ACHIEVEMENT_DONE } from "../vuex/mutation-types";
 import firebase from "firebase";
 
 export default {
   data() {
     return {
-    flags: [
-      {value:"Get 10 HTC", isPushed:false},
-      {value:"Get 10 HTC", isPushed:false},
-      {value:"Get 10 HTC", isPushed:false},
-      {value:"Get 10 HTC", isPushed:false},
-      {value:"Get 10 HTC", isPushed:false}
-    ]}
+      flags: [
+        { value: "Get 10 HTC", isActive: false },
+        { value: "Get 10 HTC", isActive: false },
+        { value: "Get 10 HTC", isActive: false },
+        { value: "Get 10 HTC", isActive: false },
+        { value: "Get 10 HTC", isActive: false }
+      ]
+    };
   },
   computed: {
-    ...mapGetters([
-      "goals",
-      "summary"
-    ]),
+    ...mapGetters(["goals", "summary"]),
     buttons: function() {
       var buttons = [
-        {id:0, value:this.flags[0].value, goal:this.goals.activeMinutes,summary:this.summary.fairlyActiveMinutes,isPushed:this.flags[0].isPushed},
-        {id:1, value:this.flags[1].value, goal:this.goals.caloriesOut,summary:this.summary.caloriesOut,isPushed:this.flags[1].isPushed},
-        {id:2, value:this.flags[2].value, goal:this.goals.distance,summary:this.summary.distances[0].distance,isPushed:this.flags[2].isPushed},
-        {id:3, value:this.flags[3].value, goal:this.goals.floors,summary:this.summary.floors,isPushed:this.flags[3].isPushed},
-        {id:4, value:this.flags[4].value, goal:this.goals.steps,summary:this.summary.steps,isPushed:this.flags[4].isPushed}
-        ]
-      return buttons
+        {
+          id: 0,
+          value: this.flags[0].value,
+          goal: this.goals.activeMinutes,
+          summary: this.summary.fairlyActiveMinutes,
+          isActive: this.flags[0].isActive
+        },
+        {
+          id: 1,
+          value: this.flags[1].value,
+          goal: this.goals.caloriesOut,
+          summary: this.summary.caloriesOut,
+          isActive: this.flags[1].isActive
+        },
+        {
+          id: 2,
+          value: this.flags[2].value,
+          goal: this.goals.distance,
+          summary: this.summary.distances[0].distance,
+          isActive: this.flags[2].isActive
+        },
+        {
+          id: 3,
+          value: this.flags[3].value,
+          goal: this.goals.floors,
+          summary: this.summary.floors,
+          isActive: this.flags[3].isActive
+        },
+        {
+          id: 4,
+          value: this.flags[4].value,
+          goal: this.goals.steps,
+          summary: this.summary.steps,
+          isActive: this.flags[4].isActive
+        }
+      ];
+      return buttons;
     }
   },
   methods: {
-    changeFlag: function(id) {
-      this.flags[id].isPushed = true
-      this.flags[id].value = "achieved"
+    changeFlag: function(index) {
+      this.flags[index].isActive = true;
+      this.flags[index].value = "achieved";
+    },
+    achieveDone: function(index) {
+      this.$store.dispatch(ACHIEVEMENT_DONE, "achievement" + index);
     }
   }
 };
 </script>
 
 <style>
-.summary{
-  border-spacing:30px;
-} 
+.summary {
+  border-spacing: 30px;
+}
 </style>
 

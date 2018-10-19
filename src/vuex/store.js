@@ -30,8 +30,8 @@ import {
   HTC_GET,
   ACCESS_TOKEN,
   GET_DAILY_SUMMARY,
-  GOALS,
-  SUMMARY
+  ACHIEVEMENTS_RESET,
+  ACHIEVEMENT_DONE
 } from './mutation-types'
 
 /**
@@ -49,7 +49,34 @@ const state = {
   isSignIn: false,
   account_creating: false,
   goals: "",
-  summary: ""
+  summary: "",
+  achievements: {
+    achievement1: {
+      amount: 10,
+      isAchieved: false,
+      isActive: false
+    },
+    achievement2: {
+      amount: 10,
+      isAchieved: false,
+      isActive: false
+    },
+    achievement3: {
+      amount: 10,
+      isAchieved: false,
+      isActive: false
+    },
+    achievement4: {
+      amount: 10,
+      isAchieved: false,
+      isActive: false
+    },
+    achievement5: {
+      amount: 10,
+      isAchieved: false,
+      isActive: false
+    },
+  },
 }
 
 /**
@@ -91,11 +118,11 @@ const actions = {
       commit(SIGNIN_SUCCESSED)
       commit(ACCOUNT_CREATED)
       eth.get_htcBalance(firebase.auth().currentUser.photoURL, contract.address).then(result => {
-        commit(HTC_GET_BALANCE, result)
-      }),
-      fitbit.getInfo().then(results => {
-        commit(GET_DAILY_SUMMARY,results.data)
-      })
+          commit(HTC_GET_BALANCE, result)
+        }),
+        fitbit.getInfo().then(results => {
+          commit(GET_DAILY_SUMMARY, results.data)
+        })
       fb.make_map(state.user_id, state.user_address)
     })
   },
@@ -105,9 +132,7 @@ const actions = {
     fb.signout();
     commit(SIGNIN_CLOSED)
   },
-  [ACCOUNT_SIGN_UP]({
-    commit,
-  }) {
+  [ACCOUNT_SIGN_UP]({}) {
     eth.account_create(state.user_id, state.user_password).then(results => {
       fb.account_create(results[0], results[1], results[2]).then(results => {})
     })
@@ -160,6 +185,20 @@ const actions = {
         commit(HTC_GET_BALANCE, result)
       })
     })
+  },
+  [ACHIEVEMENTS_RESET]({
+    commit
+  }) {
+    commit(ACHIEVEMENTS_RESET)
+  },
+  [ACHIEVEMENT_DONE]({
+    commit,
+    state
+  }, index) {
+    eth.create_htc(state.user_address, 10).then(res => {
+      commit(HTC_GET_BALANCE, (Number(state.user_balance) + Number(state.achievements[index].amount)))
+    })
+    commit(ACHIEVEMENT_DONE, index)
   }
 }
 
@@ -229,10 +268,23 @@ const mutations = {
   [HTC_GET_BALANCE](state, balance) {
     state.user_balance = balance
   },
-  [GET_DAILY_SUMMARY](state,data) {
+  [GET_DAILY_SUMMARY](state, data) {
     state.goals = data.goals
     state.summary = data.summary
-  }
+  },
+  [ACHIEVEMENTS_RESET](state) {
+    for (achievement in state.ahievements) {
+      achievement.isAchieved = false
+    }
+  },
+  [ACHIEVEMENT_DONE](state, index) {
+    state.achievements[index].isAchieved = true;
+  },
+  [GET_DAILY_SUMMARY](state, data) {
+    state.goals = data.goals
+    state.summary = data.summary
+  },
+
 }
 
 /**

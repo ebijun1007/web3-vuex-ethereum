@@ -3,8 +3,8 @@ import firebase from "firebase";
 import * as contract from "../contracts/originalCoin.js"
 
 
-//var IP = "10.70.85.45"
-var IP ="192.168.11.8"
+//var IP = "10.70.84.101"
+var IP = "192.168.11.8"
 var COIN_BASE = "0x757352e78f16e49f6151db415ca63ee89c9b05e5"
 
 export function account_create(id, password) {
@@ -96,7 +96,6 @@ export function get_sendAddress(address) {
 
 export function send_htc(from, to, amount) {
   var data = contract.sendCont_hexAddress(from, to, amount)
-  console.log(data)
   return new Promise((resolve, reject) => {
     axios({
         method: "POST",
@@ -123,7 +122,6 @@ export function send_htc(from, to, amount) {
 
 export function create_htc(address, amount) {
   var data = contract.createCont_hexAddress(address, amount)
-  console.log(data)
   return new Promise((resolve, reject) => {
     axios({
         method: "POST",
@@ -147,4 +145,3 @@ export function create_htc(address, amount) {
       });
   })
 }
-

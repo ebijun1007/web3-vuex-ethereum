@@ -12,32 +12,18 @@
 
 <script>
 import { mapActions } from "vuex";
-import { mapGetters } from "vuex";
-import {
-  HTC_GET,
-  INPUT_GET_AMOUNT
-} from "../vuex/mutation-types";
 
-export default { 
-  computed: {
-    ...mapGetters([
-      "signin_successed",
-      "user_id",
-      "user_address",
-      "user_balance"
-    ])
-  },
+import { HTC_GET, INPUT_GET_AMOUNT } from "../vuex/mutation-types";
+
+export default {
   methods: {
-    ...mapActions([
-      HTC_GET,
-      INPUT_GET_AMOUNT
-    ])
+    ...mapActions([HTC_GET, INPUT_GET_AMOUNT])
   }
 };
 </script>
 
 <style>
-table{
-    margin:auto;
+table {
+  margin: auto;
 }
 </style>

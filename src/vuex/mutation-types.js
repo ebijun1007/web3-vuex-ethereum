@@ -29,3 +29,5 @@ export const ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMkQ5NDgiLCJzdWIiOi
 export const GET_DAILY_SUMMARY = "GET_DAILY_SUMMARY"
 export const GOALS = "GOALS"
 export const SUMMALY = "SUMMARY"
+export const ACHIEVEMENTS_RESET = "ACHIEVEMENTS_RESET"
+export const ACHIEVEMENT_DONE = "ACHIEVEMENT_DONE"

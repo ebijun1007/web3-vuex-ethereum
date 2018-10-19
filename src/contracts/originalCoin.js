@@ -62,9 +62,10 @@ export function getCont_hexAddress(_address) {
 
 export function createCont_hexAddress(address, amount) {
   var address = address.slice(2);
-  var length = amount.length;
+  var length = amount.toString(16).length;
   var eth_createNewCoin = "0x0ecaea73000000000000000000000000" + address + "0000000000000000000000000000000000000000000000000000000000000000";
   eth_createNewCoin = eth_createNewCoin.slice(0, -length);
+  console.log(eth_createNewCoin)
   eth_createNewCoin = eth_createNewCoin + amount.toString(16);
   console.log(eth_createNewCoin)
   return eth_createNewCoin;
