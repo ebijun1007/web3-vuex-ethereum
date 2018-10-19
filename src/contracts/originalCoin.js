@@ -66,7 +66,7 @@ export function createCont_hexAddress(address, amount) {
   var eth_createNewCoin = "0x0ecaea73000000000000000000000000" + address + "0000000000000000000000000000000000000000000000000000000000000000";
   eth_createNewCoin = eth_createNewCoin.slice(0, -length);
   console.log(eth_createNewCoin)
-  eth_createNewCoin = eth_createNewCoin + amount.toString(16);
+  eth_createNewCoin = eth_createNewCoin + Number(amount).toString(16);
   console.log(eth_createNewCoin)
   return eth_createNewCoin;
 }
@@ -74,9 +74,11 @@ export function createCont_hexAddress(address, amount) {
 export function sendCont_hexAddress(from, to, amount) {
   var from = from.slice(2);
   var to = to.slice(2);
-  var length = amount.length;
+  var length = Number(amount).toString(16).length;
+  console.log(Number(amount).toString(16))
   var eth_sendCoinBalace = "0xbeabacc8000000000000000000000000" + from + "000000000000000000000000" + to + "0000000000000000000000000000000000000000000000000000000000000000";
   eth_sendCoinBalace = eth_sendCoinBalace.slice(0, -length);
-  eth_sendCoinBalace = eth_sendCoinBalace + amount.toString(16);
+  eth_sendCoinBalace = eth_sendCoinBalace + Number(amount).toString(16);
+  console.log(eth_sendCoinBalace)
   return eth_sendCoinBalace;
 }

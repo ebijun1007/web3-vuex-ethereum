@@ -96,6 +96,7 @@ export function get_sendAddress(address) {
 
 export function send_htc(from, to, amount) {
   var data = contract.sendCont_hexAddress(from, to, amount)
+  console.log(data)
   return new Promise((resolve, reject) => {
     axios({
         method: "POST",
