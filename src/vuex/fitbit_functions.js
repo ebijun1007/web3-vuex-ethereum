@@ -43,7 +43,7 @@ export function getInfo() {
         floors: {
           id: "floors",
           index: "3",
-          value: 10,
+          value: 20,
           goal: res.data.goals.floors,
           summary: res.data.summary.floors,
           isAchieved: isAchieved(res.data.goals.floors, res.data.summary.floors),

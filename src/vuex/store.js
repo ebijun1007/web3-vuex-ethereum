@@ -3,7 +3,7 @@ import Vue from 'vue'
 import axios from "axios"
 import Router from 'vue-router'
 import firebase from "firebase"
-import * as contract from "../contracts/originalCoin.js"
+import * as contract from "../contracts/HealthCoinContracts.js"
 import * as eth from './eth_functions.js'
 import * as fitbit from './fitbit_functions.js'
 import * as fb from './firebase_functions.js'
@@ -48,35 +48,7 @@ const state = {
   get_amount: "",
   isSignIn: false,
   account_creating: false,
-  goals: "",
-  summary: "",
-  achievements: {
-    achievement1: {
-      amount: 10,
-      isAchieved: false,
-      isActive: false
-    },
-    achievement2: {
-      amount: 10,
-      isAchieved: false,
-      isActive: false
-    },
-    achievement3: {
-      amount: 10,
-      isAchieved: false,
-      isActive: false
-    },
-    achievement4: {
-      amount: 10,
-      isAchieved: false,
-      isActive: false
-    },
-    achievement5: {
-      amount: 10,
-      isAchieved: false,
-      isActive: false
-    },
-  },
+  achievements: ""
 }
 
 /**
@@ -121,7 +93,7 @@ const actions = {
           commit(HTC_GET_BALANCE, result)
         }),
         fitbit.getInfo().then(results => {
-          commit(GET_DAILY_SUMMARY, results.data)
+          commit(GET_DAILY_SUMMARY, results)
         })
       fb.make_map(state.user_id, state.user_address)
     })
@@ -218,9 +190,7 @@ const getters = {
   //アカウント作成状態（bool)
   account_creating: state => state.account_creating,
   //fitbitの目標
-  goals: state => state.goals,
-  //fitbitの活動量
-  summary: state => state.summary,
+  achievements: state => state.achievements
 }
 
 /**
@@ -281,8 +251,8 @@ const mutations = {
     state.achievements[index].isAchieved = true;
   },
   [GET_DAILY_SUMMARY](state, data) {
-    state.goals = data.goals
-    state.summary = data.summary
+    console.log(data)
+    state.achievements = data
   },
 
 }

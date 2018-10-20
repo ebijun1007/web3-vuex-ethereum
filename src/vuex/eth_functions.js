@@ -1,6 +1,6 @@
 import axios from "axios"
 import firebase from "firebase";
-import * as contract from "../contracts/originalCoin.js"
+import * as contract from "../contracts/HealthCoinContracts.js"
 
 
 //var IP = "10.70.84.101"
