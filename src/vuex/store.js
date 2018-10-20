@@ -31,7 +31,7 @@ import {
   ACCESS_TOKEN,
   GET_DAILY_SUMMARY,
   ACHIEVEMENTS_RESET,
-  ACHIEVEMENT_DONE
+  ACHIEVEMENT_BUTTON_PUSH
 } from './mutation-types'
 
 /**
@@ -163,7 +163,7 @@ const actions = {
   }) {
     commit(ACHIEVEMENTS_RESET)
   },
-  [ACHIEVEMENT_DONE]({
+  [ACHIEVEMENT_BUTTON_PUSH]({
     commit,
     state
   }, achievement) {
@@ -171,7 +171,7 @@ const actions = {
       commit(HTC_GET_BALANCE, (Number(state.user_balance) + Number(achievement.value)))
       achievement.isPushed = true;
     })
-    commit(ACHIEVEMENT_DONE, index)
+    commit(ACHIEVEMENT_BUTTON_PUSH, achievement)
   }
 }
 
@@ -244,7 +244,13 @@ const mutations = {
       achievement.isAchieved = false
     }
   },
-  [ACHIEVEMENT_DONE](state, index) {},
+  [ACHIEVEMENT_BUTTON_PUSH](state, achievement) {
+    var id = achievement.id
+    var index = achievement.index
+    console.log(state.daily_summary)
+    console.log(state.daily_summary[id])
+    state.daily_summary[id].isPushed = true
+  },
   [GET_DAILY_SUMMARY](state, data) {
     state.daily_summary = data
   },

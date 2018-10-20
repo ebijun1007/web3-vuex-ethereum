@@ -22,7 +22,7 @@
           <th/>
           <td v-for="summary in daily_summary" :key="summary.id" >
             <el-button v-if="!summary.isAchieved" :disabled="true" type="success" round>Get {{summary.value}} HTC </el-button>
-            <el-button v-else-if="!summary.isPushed" @click="ACHIEVEMENT_DONE({id:summary.id, index:summary.index, value: achievement.value})" type="success" round>Get {{summary.value}} HTC </el-button>
+            <el-button v-else-if="!summary.isPushed" @click="ACHIEVEMENT_BUTTON_PUSH({id:summary.id, index:summary.index, value: summary.value})" type="success" round>Get {{summary.value}} HTC </el-button>
             <el-button v-else :disabled="true" type="success" round> DONE </el-button>
           </td>
           
@@ -37,7 +37,10 @@
 <script>
 import { mapGetters } from "vuex";
 import { mapActions } from "vuex";
-import { GET_DAILY_SUMMARY, ACHIEVEMENT_DONE } from "../vuex/mutation-types";
+import {
+  GET_DAILY_SUMMARY,
+  ACHIEVEMENT_BUTTON_PUSH
+} from "../vuex/mutation-types";
 import firebase from "firebase";
 
 export default {
@@ -48,7 +51,7 @@ export default {
     ...mapGetters(["daily_summary", "buttons_pushed"])
   },
   methods: {
-    ...mapActions([ACHIEVEMENT_DONE])
+    ...mapActions([ACHIEVEMENT_BUTTON_PUSH])
   }
 };
 </script>
