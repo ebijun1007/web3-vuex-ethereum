@@ -53,32 +53,29 @@ export const abi = [{
 
 export const address = "0xe9a9a5b11ed5add6e79ee9bbc256bbf3971ce09f";
 
-export function getCont_hexAddress(_address) {
-  0x70a08231000000000000000000000000f0d0177de88ddfd7f90ac4e77b2fe95900000000
-  var address = _address.slice(2);
-  const eth_getCoinBalance = "0x70a08231000000000000000000000000" + address;
-  return eth_getCoinBalance;
+export function getCont_hexAddress(address) {
+  var address = address.slice(2);
+  const balance = "0x70a08231000000000000000000000000" + address;
+  return balance;
 }
 
 export function createCont_hexAddress(address, amount) {
   var address = address.slice(2);
   var length = amount.toString(16).length;
-  var eth_createNewCoin = "0x0ecaea73000000000000000000000000" + address + "0000000000000000000000000000000000000000000000000000000000000000";
-  eth_createNewCoin = eth_createNewCoin.slice(0, -length);
-  console.log(eth_createNewCoin)
-  eth_createNewCoin = eth_createNewCoin + Number(amount).toString(16);
-  console.log(eth_createNewCoin)
-  return eth_createNewCoin;
+  var create = "0x0ecaea73000000000000000000000000" + address + "0000000000000000000000000000000000000000000000000000000000000000";
+  create = create.slice(0, -length);
+  create = create + Number(amount).toString(16);
+  console.log(create)
+  return create;
 }
 
 export function sendCont_hexAddress(from, to, amount) {
   var from = from.slice(2);
   var to = to.slice(2);
   var length = Number(amount).toString(16).length;
-  console.log(Number(amount).toString(16))
-  var eth_sendCoinBalace = "0xbeabacc8000000000000000000000000" + from + "000000000000000000000000" + to + "0000000000000000000000000000000000000000000000000000000000000000";
-  eth_sendCoinBalace = eth_sendCoinBalace.slice(0, -length);
-  eth_sendCoinBalace = eth_sendCoinBalace + Number(amount).toString(16);
-  console.log(eth_sendCoinBalace)
-  return eth_sendCoinBalace;
+  var send = "0xbeabacc8000000000000000000000000" + from + "000000000000000000000000" + to + "0000000000000000000000000000000000000000000000000000000000000000";
+  send = send.slice(0, -length);
+  send = send + Number(amount).toString(16);
+  console.log(send)
+  return send;
 }

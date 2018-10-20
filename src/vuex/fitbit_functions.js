@@ -12,7 +12,54 @@ export function getInfo() {
       }
     }).then((res) => {
       console.log(res)
-      resolve(res)
+      var achievements = {
+        activeminutes: {
+          id: "activeminutes",
+          index: "0",
+          value: 10,
+          goal: res.data.goals.activeMinutes,
+          summary: res.data.summary.fairlyActiveMinutes,
+          isAchieved: isAchieved(res.data.goals.activeMinutes, res.data.summary.fairlyActiveMinutes),
+          isPushed: false
+        },
+        caloriesOut: {
+          id: "caloriesOut",
+          index: "1",
+          value: 10,
+          goal: res.data.goals.caloriesOut,
+          summary: res.data.summary.caloriesOut,
+          isAchieved: isAchieved(res.data.goals.caloriesOut, res.data.summary.caloriesOut),
+          isPushed: false
+        },
+        distance: {
+          id: "distance",
+          index: "2",
+          value: 10,
+          goal: res.data.goals.distance,
+          summary: res.data.summary.distances[0].distance,
+          isAchieved: isAchieved(res.data.goals.distance, res.data.summary.distances[0].distance),
+          isPushed: false
+        },
+        floors: {
+          id: "floors",
+          index: "3",
+          value: 10,
+          goal: res.data.goals.floors,
+          summary: res.data.summary.floors,
+          isAchieved: isAchieved(res.data.goals.floors, res.data.summary.floors),
+          isPushed: false
+        },
+        steps: {
+          id: "steps",
+          index: "4",
+          value: 10,
+          goal: res.data.goals.steps,
+          summary: res.data.summary.steps,
+          isAchieved: isAchieved(res.data.goals.steps, res.data.summary.steps),
+          isPushed: false
+        }
+      }
+      resolve(achievements)
     });
   })
 }
@@ -24,4 +71,11 @@ export function getNowYMD() {
   var d = ("00" + dt.getDate()).slice(-2);
   var result = y + "-" + m + "-" + d;
   return result;
+}
+
+function isAchieved(goal, summary) {
+  if (summary >= goal)
+    return true
+  else
+    return false
 }
