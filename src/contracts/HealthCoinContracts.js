@@ -53,7 +53,7 @@ export const abi = [{
 
 export const address = "0xe9a9a5b11ed5add6e79ee9bbc256bbf3971ce09f";
 
-export function getCont_hexAddress(address) {
+export function getCont_hexAddress(address, flags) {
   var address = address.slice(2);
   const balance = "0x70a08231000000000000000000000000" + address;
   return balance;

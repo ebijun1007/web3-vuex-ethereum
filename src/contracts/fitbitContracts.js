@@ -121,17 +121,20 @@ export const address = "0xd4299774d623a1fa0e312bab457323e749fa6fb0"
 //   return token;
 // }
 
-export function setFlags(address, flags) {
+export function setFlags(address, summaries) {
   var address = address.slice(2);
   var common = "000000000000000000000000000000000000000000000000000000000000000"
   var base = "0x91ba7caf000000000000000000000000"
   var setflags = base + address;
-  for (flag in flags) {
-    if (flag)
+  for (var summary in summaries) {
+    console.log(summaries)
+    console.log(summaries[summary].isPushed)
+    if (summaries[summary].isPushed)
       setflags = setflags + common + "1";
     else
       setflags = setflags + common + "0";
   }
+  console.log(setflags)
   return setflags
 }
 

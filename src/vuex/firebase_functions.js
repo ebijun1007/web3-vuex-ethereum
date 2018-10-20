@@ -13,7 +13,7 @@ import axios from "axios"
  */
 export function signin(id, password) {
   return new Promise((resolve, reject) => {
-    console.log("id:" + id, "pass:" + password)
+    // console.log("id:" + id, "pass:" + password)
     firebase
       .auth()
       .signInWithEmailAndPassword(
@@ -22,7 +22,7 @@ export function signin(id, password) {
       )
       .then(
         user => {
-          console.log("sign in")
+          // console.log("sign in")
           resolve()
         },
         err => {

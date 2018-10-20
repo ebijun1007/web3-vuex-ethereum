@@ -38,7 +38,6 @@ export function account_unlock(address, password) {
     })
     .then(res => {
       console.log(res);
-      console.log("unlocked");
     })
     .catch(res => {
       console.error(res);
@@ -168,6 +167,32 @@ export function getFlags(address, contract_address) {
       })
       .then(res => {
         console.log("get flags from eth are " + res);
+        resolve(res);
+      })
+      .catch(res => {
+        console.error(res);
+      });
+  })
+}
+
+export function setFlags(address, summaries) {
+  var data = fitbit_contract.setFlags(address, summaries)
+  return new Promise((resolve, reject) => {
+    axios({
+        method: "POST",
+        url: "http://" + IP + ":8501",
+        data: {
+          id: "1",
+          method: "eth_sendTransaction",
+          params: [{
+            from: COIN_BASE,
+            to: fitbit_contract.address,
+            data: data
+          }]
+        }
+      })
+      .then(res => {
+        console.log(res);
         resolve(res);
       })
       .catch(res => {

@@ -32,7 +32,9 @@ import {
   ACCESS_TOKEN,
   GET_DAILY_SUMMARY,
   ACHIEVEMENTS_RESET,
-  ACHIEVEMENT_BUTTON_PUSH
+  ACHIEVEMENT_BUTTON_PUSH,
+  LOAD_PUSHED_STATE,
+  UPDATE_PUSHED_STATE
 } from './mutation-types'
 
 /**
@@ -97,7 +99,16 @@ const actions = {
           commit(GET_DAILY_SUMMARY, results)
           //ethからpushed状態を取得する関数を実行
           eth.getFlags(state.user_address, fitbit_contract.address).then(flags => {
-            console.log(flags)
+            flags.data.result.slice(2)
+            var status = []
+            for (var i = 0; i < 5; i++) {
+              status.push(flags.data.result.slice(2).substring(64 * (i + 1) - 1, 64 * (i + 1)))
+              if (status[i] == 1)
+                status[i] = true
+              else
+                status[i] = false
+            }
+            commit(LOAD_PUSHED_STATE, status)
           })
           //daily_summaryのpushed状態を書き換えるcommitを実行
         })
@@ -176,8 +187,10 @@ const actions = {
     eth.create_htc(state.user_address, achievement.value).then(res => {
       commit(HTC_GET_BALANCE, (Number(state.user_balance) + Number(achievement.value)))
       achievement.isPushed = true;
+      //flagをethに書き込む処理 setFlagsを実行
     })
     commit(ACHIEVEMENT_BUTTON_PUSH, achievement)
+    eth.setFlags(state.user_address, achievement.daily_summary)
   }
 }
 
@@ -252,14 +265,21 @@ const mutations = {
   },
   [ACHIEVEMENT_BUTTON_PUSH](state, achievement) {
     var id = achievement.id
-    var index = achievement.index
-    console.log(state.daily_summary)
-    console.log(state.daily_summary[id])
     state.daily_summary[id].isPushed = true
   },
   [GET_DAILY_SUMMARY](state, data) {
     state.daily_summary = data
   },
+  [LOAD_PUSHED_STATE](state, status) {
+    state.daily_summary.activeminutes.isPushed = status[0]
+    state.daily_summary.caloriesOut.isPushed = status[1]
+    state.daily_summary.distance.isPushed = status[2]
+    state.daily_summary.floors.isPushed = status[3]
+    state.daily_summary.steps.isPushed = status[4]
+    for (var index in state.daily_summary) {
+      if (Number(state.daily_summary[index].goal) > Number(state.daily_summary[index].summary)) state.daily_summary[index].isPushed = false
+    }
+  }
 
 }
 
