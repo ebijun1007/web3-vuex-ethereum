@@ -12,23 +12,25 @@
         <tbody>
         <tr>
           <th>Goal</th>
-          <td v-for="achievement in achievements" :key="achievement.goal"> {{achievement.goal}}</td>
+          <td v-for="summary in daily_summary" :key="summary.goal"> {{summary.goal}}</td>
         </tr>
         <tr>
           <th>Summary</th>
-          <td v-for="achievement in achievements" :key="achievement.goal"> {{achievement.summary}}</td>
+          <td v-for="summary in daily_summary" :key="summary.goal"> {{summary.summary}}</td>
         </tr>
         <tr>
           <th/>
-          <td v-for="achievement in achievements" v-if="!achievement.isAchieved" :key="achievement.id"> <el-button disabled="true" type="success" round>Get {{achievement.value}} HTC </el-button></td>
-          <td v-else-if="!achievement.isPushed"> <el-button @click="ACHIEVEMENT_DONE({id:achievement.id, index:achievement.index, value: achievement.value})" type="success" round>Get {{achievement.value}} HTC </el-button></td>
-          <td v-else> <el-button disabled="true" type="success" round> DONE </el-button></td>
-          <!-- <td v-if="!achievement.isAchieved" v-for="achievement in achievements" :key="achievement.id"> <el-button :disabled="buttons_pushed[achievement.index]" @click="ACHIEVEMENT_DONE({id:achievement.id, index:achievement.index, value: achievement.value})" type="success" round>Get {{achievement.value}} HTC </el-button></td>
+          <td v-for="summary in daily_summary" :key="summary.id" >
+            <el-button v-if="!summary.isAchieved" :disabled="true" type="success" round>Get {{summary.value}} HTC </el-button>
+            <el-button v-else-if="!summary.isPushed" @click="ACHIEVEMENT_DONE({id:summary.id, index:summary.index, value: achievement.value})" type="success" round>Get {{summary.value}} HTC </el-button>
+            <el-button v-else :disabled="true" type="success" round> DONE </el-button>
+          </td>
+          
+          <!-- <td v-if="!achievement.isAchieved" v-for="achievement in daily_summary" :key="achievement.id"> <el-button :disabled="buttons_pushed[achievement.index]" @click="ACHIEVEMENT_DONE({id:achievement.id, index:achievement.index, value: achievement.value})" type="success" round>Get {{achievement.value}} HTC </el-button></td>
           <td v-else> <el-button :disabled="buttons_pushed[achievement.index]" type="success" round>Done</el-button></td> -->
         </tr>
         </tbody>
       </table>
-      {{ achievements }}
     </div>
 </template>
 
@@ -43,7 +45,7 @@ export default {
     return {};
   },
   computed: {
-    ...mapGetters(["achievements", "buttons_pushed"])
+    ...mapGetters(["daily_summary", "buttons_pushed"])
   },
   methods: {
     ...mapActions([ACHIEVEMENT_DONE])

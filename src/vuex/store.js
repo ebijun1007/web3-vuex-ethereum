@@ -48,7 +48,7 @@ const state = {
   get_amount: "",
   isSignIn: false,
   account_creating: false,
-  achievements: ""
+  daily_summary: ""
 }
 
 /**
@@ -166,9 +166,10 @@ const actions = {
   [ACHIEVEMENT_DONE]({
     commit,
     state
-  }, index) {
-    eth.create_htc(state.user_address, 10).then(res => {
-      commit(HTC_GET_BALANCE, (Number(state.user_balance) + Number(state.achievements[index].amount)))
+  }, achievement) {
+    eth.create_htc(state.user_address, achievement.value).then(res => {
+      commit(HTC_GET_BALANCE, (Number(state.user_balance) + Number(achievement.value)))
+      achievement.isPushed = true;
     })
     commit(ACHIEVEMENT_DONE, index)
   }
@@ -190,7 +191,7 @@ const getters = {
   //アカウント作成状態（bool)
   account_creating: state => state.account_creating,
   //fitbitの目標
-  achievements: state => state.achievements
+  daily_summary: state => state.daily_summary
 }
 
 /**
@@ -238,21 +239,14 @@ const mutations = {
   [HTC_GET_BALANCE](state, balance) {
     state.user_balance = balance
   },
-  [GET_DAILY_SUMMARY](state, data) {
-    state.goals = data.goals
-    state.summary = data.summary
-  },
   [ACHIEVEMENTS_RESET](state) {
     for (achievement in state.ahievements) {
       achievement.isAchieved = false
     }
   },
-  [ACHIEVEMENT_DONE](state, index) {
-    state.achievements[index].isAchieved = true;
-  },
+  [ACHIEVEMENT_DONE](state, index) {},
   [GET_DAILY_SUMMARY](state, data) {
-    console.log(data)
-    state.achievements = data
+    state.daily_summary = data
   },
 
 }
