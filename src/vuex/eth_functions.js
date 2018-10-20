@@ -1,6 +1,8 @@
 import axios from "axios"
 import firebase from "firebase";
-import * as contract from "../contracts/HealthCoinContracts.js"
+import * as HTC_contract from "../contracts/HealthCoinContracts.js"
+import * as fitbit_contract from "../contracts/fitbitContracts.js"
+
 
 
 //var IP = "10.70.84.101"
@@ -54,7 +56,7 @@ export function get_htcBalance(address, contract_address) {
           params: [{
               from: address,
               to: contract_address,
-              data: contract.getCont_hexAddress(address)
+              data: HTC_contract.getCont_hexAddress(address)
             },
             "latest"
           ]
@@ -95,7 +97,7 @@ export function get_sendAddress(address) {
 }
 
 export function send_htc(from, to, amount) {
-  var data = contract.sendCont_hexAddress(from, to, amount)
+  var data = HTC_contract.sendCont_hexAddress(from, to, amount)
   console.log(data)
   return new Promise((resolve, reject) => {
     axios({
@@ -106,7 +108,7 @@ export function send_htc(from, to, amount) {
           method: "eth_sendTransaction",
           params: [{
             from: COIN_BASE,
-            to: contract.address,
+            to: HTC_contract.address,
             data: data
           }]
         }
@@ -122,7 +124,7 @@ export function send_htc(from, to, amount) {
 }
 
 export function create_htc(address, amount) {
-  var data = contract.createCont_hexAddress(address, amount)
+  var data = HTC_contract.createCont_hexAddress(address, amount)
   return new Promise((resolve, reject) => {
     axios({
         method: "POST",
@@ -132,7 +134,7 @@ export function create_htc(address, amount) {
           method: "eth_sendTransaction",
           params: [{
             from: COIN_BASE,
-            to: contract.address,
+            to: HTC_contract.address,
             data: data
           }]
         }
@@ -140,6 +142,33 @@ export function create_htc(address, amount) {
       .then(res => {
         console.log(res);
         resolve(parseInt(res.data.result, 16));
+      })
+      .catch(res => {
+        console.error(res);
+      });
+  })
+}
+
+export function getFlags(address, contract_address) {
+  return new Promise((resolve, reject) => {
+    axios({
+        method: "POST",
+        url: "http://" + IP + ":8501",
+        data: {
+          id: "1",
+          method: "eth_call",
+          params: [{
+              from: address,
+              to: contract_address,
+              data: fitbit_contract.getFlags(address)
+            },
+            "latest"
+          ]
+        }
+      })
+      .then(res => {
+        console.log("get flags from eth are " + res);
+        resolve(res);
       })
       .catch(res => {
         console.error(res);

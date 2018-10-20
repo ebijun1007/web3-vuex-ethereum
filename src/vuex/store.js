@@ -3,7 +3,8 @@ import Vue from 'vue'
 import axios from "axios"
 import Router from 'vue-router'
 import firebase from "firebase"
-import * as contract from "../contracts/HealthCoinContracts.js"
+import * as HTC_contract from "../contracts/HealthCoinContracts.js"
+import * as fitbit_contract from "../contracts/fitbitContracts.js"
 import * as eth from './eth_functions.js'
 import * as fitbit from './fitbit_functions.js'
 import * as fb from './firebase_functions.js'
@@ -89,11 +90,16 @@ const actions = {
       eth.account_unlock(firebase.auth().currentUser.photoURL, state.user_password)
       commit(SIGNIN_SUCCESSED)
       commit(ACCOUNT_CREATED)
-      eth.get_htcBalance(firebase.auth().currentUser.photoURL, contract.address).then(result => {
+      eth.get_htcBalance(firebase.auth().currentUser.photoURL, HTC_contract.address).then(result => {
           commit(HTC_GET_BALANCE, result)
         }),
         fitbit.getInfo().then(results => {
           commit(GET_DAILY_SUMMARY, results)
+          //ethからpushed状態を取得する関数を実行
+          eth.getFlags(state.user_address, fitbit_contract.address).then(flags => {
+            console.log(flags)
+          })
+          //daily_summaryのpushed状態を書き換えるcommitを実行
         })
       fb.make_map(state.user_id, state.user_address)
     })
@@ -153,7 +159,7 @@ const actions = {
   }) {
     //promise関数内でcommitが使えないためfirebaseをかませてごまかし
     fb.signin(state.user_id, state.user_password).then(results => {
-      eth.get_htcBalance(firebase.auth().currentUser.photoURL, contract.address).then(result => {
+      eth.get_htcBalance(firebase.auth().currentUser.photoURL, HTC_contract.address).then(result => {
         commit(HTC_GET_BALANCE, result)
       })
     })
