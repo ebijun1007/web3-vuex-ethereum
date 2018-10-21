@@ -19,17 +19,13 @@
           <td v-for="summary in daily_summary" :key="summary.goal"> {{summary.summary}}</td>
         </tr>
         <tr>
-          <th/>
+
           <td v-for="summary in daily_summary" :key="summary.id" >
             <el-button v-if="!summary.isAchieved" :disabled="true" type="success" round>Get {{summary.value}} HTC </el-button>
             <el-button v-else-if="!summary.isPushed" @click="ACHIEVEMENT_BUTTON_PUSH({id:summary.id, index:summary.index, value: summary.value,daily_summary:daily_summary})" type="success" round>Get {{summary.value}} HTC </el-button>
             <el-button v-else :disabled="true" type="success" round> DONE </el-button>
-            {{ summary.isPushed}}
-
+            {{ summary.isAchieved}}{{ summary.isPushed}}
           </td>
-          
-          <!-- <td v-if="!achievement.isAchieved" v-for="achievement in daily_summary" :key="achievement.id"> <el-button :disabled="buttons_pushed[achievement.index]" @click="ACHIEVEMENT_DONE({id:achievement.id, index:achievement.index, value: achievement.value})" type="success" round>Get {{achievement.value}} HTC </el-button></td>
-          <td v-else> <el-button :disabled="buttons_pushed[achievement.index]" type="success" round>Done</el-button></td> -->
         </tr>
         </tbody>
         <div/>
@@ -42,7 +38,8 @@ import { mapGetters } from "vuex";
 import { mapActions } from "vuex";
 import {
   GET_DAILY_SUMMARY,
-  ACHIEVEMENT_BUTTON_PUSH
+  ACHIEVEMENT_BUTTON_PUSH,
+  UPDATE_PUSHED_STATE
 } from "../vuex/mutation-types";
 import firebase from "firebase";
 
@@ -51,10 +48,10 @@ export default {
     return {};
   },
   computed: {
-    ...mapGetters(["daily_summary", "buttons_pushed"])
+    ...mapGetters(["daily_summary"])
   },
   methods: {
-    ...mapActions([ACHIEVEMENT_BUTTON_PUSH])
+    ...mapActions([ACHIEVEMENT_BUTTON_PUSH, UPDATE_PUSHED_STATE])
   }
 };
 </script>

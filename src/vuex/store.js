@@ -108,6 +108,7 @@ const actions = {
               else
                 status[i] = false
             }
+            console.log(status)
             commit(LOAD_PUSHED_STATE, status)
           })
           //daily_summaryのpushed状態を書き換えるcommitを実行
@@ -190,7 +191,14 @@ const actions = {
       //flagをethに書き込む処理 setFlagsを実行
     })
     commit(ACHIEVEMENT_BUTTON_PUSH, achievement)
-    eth.setFlags(state.user_address, achievement.daily_summary)
+    // eth.setFlags(state.user_address, achievement.daily_summary)
+  },
+  [UPDATE_PUSHED_STATE]({
+    commit,
+    state
+  }, summaries) {
+    eth.setFlags(state.user_address, summaries)
+    commit(UPDATE_PUSHED_STATE, summaries)
   }
 }
 
@@ -266,6 +274,7 @@ const mutations = {
   [ACHIEVEMENT_BUTTON_PUSH](state, achievement) {
     var id = achievement.id
     state.daily_summary[id].isPushed = true
+    eth.setFlags(state.user_address, state.daily_summary)
   },
   [GET_DAILY_SUMMARY](state, data) {
     state.daily_summary = data
@@ -278,6 +287,19 @@ const mutations = {
     state.daily_summary.steps.isPushed = status[4]
     for (var index in state.daily_summary) {
       if (Number(state.daily_summary[index].goal) > Number(state.daily_summary[index].summary)) state.daily_summary[index].isPushed = false
+      if (state.daily_summary[index].isAchieved == false) state.daily_summary[index].isPushed = false
+    }
+    eth.setFlags(state.user_address, state.daily_summary)
+  },
+  [UPDATE_PUSHED_STATE](state, status) {
+    state.daily_summary.activeminutes.isPushed = status[0]
+    state.daily_summary.caloriesOut.isPushed = status[1]
+    state.daily_summary.distance.isPushed = status[2]
+    state.daily_summary.floors.isPushed = status[3]
+    state.daily_summary.steps.isPushed = status[4]
+    for (var index in state.daily_summary) {
+      if (Number(state.daily_summary[index].goal) > Number(state.daily_summary[index].summary)) state.daily_summary[index].isPushed = false
+      if (state.daily_summary[index].isAchieved == false) state.daily_summary[index].isPushed = false
     }
   }
 

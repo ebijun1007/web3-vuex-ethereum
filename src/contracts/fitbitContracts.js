@@ -103,7 +103,7 @@ export const abi = [{
   }
 ]
 
-export const address = "0xd4299774d623a1fa0e312bab457323e749fa6fb0"
+export const address = "0x11a379c14b9fd92d3efeb8d98b061abde75da60f"
 
 // export function setToken(address, token) {
 //   var address = address.slice(2);
@@ -127,8 +127,6 @@ export function setFlags(address, summaries) {
   var base = "0x91ba7caf000000000000000000000000"
   var setflags = base + address;
   for (var summary in summaries) {
-    console.log(summaries)
-    console.log(summaries[summary].isPushed)
     if (summaries[summary].isPushed)
       setflags = setflags + common + "1";
     else
