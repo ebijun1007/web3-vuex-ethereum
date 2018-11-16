@@ -5,9 +5,10 @@ import * as fitbit_contract from "../contracts/fitbitContracts.js"
 
 
 
-//var IP = "10.70.84.101"
-var IP = "192.168.11.8"
-var COIN_BASE = "0x757352e78f16e49f6151db415ca63ee89c9b05e5"
+// var IP = "10.70.84.101"
+// var IP = "192.168.11.20"
+var IP = "127.0.0.1"
+var COIN_BASE = "0x776b691966896aeeb7311366daf564e70e80a8c7"
 
 export function account_create(id, password) {
   return new Promise((resolve, reject) => {

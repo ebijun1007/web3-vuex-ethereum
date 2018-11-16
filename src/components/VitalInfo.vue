@@ -19,12 +19,12 @@
           <td v-for="summary in daily_summary" :key="summary.goal"> {{summary.summary}}</td>
         </tr>
         <tr>
-
+          <th/>
           <td v-for="summary in daily_summary" :key="summary.id" >
-            <el-button v-if="!summary.isAchieved" :disabled="true" type="success" round>Get {{summary.value}} HTC </el-button>
+            <el-button v-if="!summary.isAchieved" :disabled="true" type="info" round>Get {{summary.value}} HTC </el-button>
             <el-button v-else-if="!summary.isPushed" @click="ACHIEVEMENT_BUTTON_PUSH({id:summary.id, index:summary.index, value: summary.value,daily_summary:daily_summary})" type="success" round>Get {{summary.value}} HTC </el-button>
             <el-button v-else :disabled="true" type="success" round> DONE </el-button>
-            {{ summary.isAchieved}}{{ summary.isPushed}}
+            <!-- {{ summary.isAchieved}}{{ summary.isPushed}} -->
           </td>
         </tr>
         </tbody>

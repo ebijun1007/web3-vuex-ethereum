@@ -122,9 +122,13 @@ const actions = {
     fb.signout();
     commit(SIGNIN_CLOSED)
   },
-  [ACCOUNT_SIGN_UP]({}) {
+  [ACCOUNT_SIGN_UP]({
+    commit,state,dispatch
+  }) {
     eth.account_create(state.user_id, state.user_password).then(results => {
-      fb.account_create(results[0], results[1], results[2]).then(results => {})
+      fb.account_create(results[0], results[1], results[2]).then(results => {
+        dispatch(ACCOUNT_SIGN_IN);
+      })
     })
   },
   [ACCOUNT_CREATED]({

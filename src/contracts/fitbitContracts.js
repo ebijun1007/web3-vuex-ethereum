@@ -103,7 +103,7 @@ export const abi = [{
   }
 ]
 
-export const address = "0x11a379c14b9fd92d3efeb8d98b061abde75da60f"
+export const address = "0xce3999cb97f6cfe2e90ea08249e88c1282ea727c"
 
 // export function setToken(address, token) {
 //   var address = address.slice(2);

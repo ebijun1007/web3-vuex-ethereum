@@ -4,8 +4,8 @@
         <el-tabs style="height: 200px; text-align: center; ">
             <el-tab-pane label="Home"><Home/></el-tab-pane>
             <el-tab-pane label="Send"><Send/></el-tab-pane>
-            <el-tab-pane label="Info"><VitalInfo/></el-tab-pane>
-            <el-tab-pane label="Get"><Get/></el-tab-pane>
+            <el-tab-pane label="Achievements"><VitalInfo/></el-tab-pane>
+            <!-- <el-tab-pane label="Get"><Get/></el-tab-pane> -->
         </el-tabs>
         </div>
         <div style="margin-top:200px;">

@@ -44,9 +44,11 @@ export function getInfo() {
           id: "floors",
           index: "3",
           value: 10,
-          goal: res.data.goals.floors,
           summary: res.data.summary.floors,
+          goal: res.data.goals.floors,
           isAchieved: isAchieved(res.data.goals.floors, res.data.summary.floors),
+          // goal:1,
+          // isAchieved: isAchieved(1, res.data.summary.floors),
           isPushed: false
         },
         steps: {
@@ -54,8 +56,10 @@ export function getInfo() {
           index: "4",
           value: 10,
           goal: res.data.goals.steps,
-          summary: res.data.summary.steps,
           isAchieved: isAchieved(res.data.goals.steps, res.data.summary.steps),
+          // goal:1,
+          // isAchieved: true,
+          summary: res.data.summary.steps,
           isPushed: false
         }
       }
@@ -65,11 +69,12 @@ export function getInfo() {
 }
 
 export function getNowYMD() {
-  var dt = new Date();
-  var y = dt.getFullYear();
-  var m = ("00" + (dt.getMonth() + 1)).slice(-2);
-  var d = ("00" + dt.getDate()).slice(-2);
-  var result = y + "-" + m + "-" + d;
+  // var dt = new Date();
+  // var y = dt.getFullYear();
+  // var m = ("00" + (dt.getMonth() + 1)).slice(-2);
+  // var d = ("00" + dt.getDate()).slice(-2);
+  // var result = y + "-" + m + "-" + d;
+  var result = "2018" + "-" + "11" + "-" + "4";
   return result;
 }
 

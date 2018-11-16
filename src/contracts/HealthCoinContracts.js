@@ -51,7 +51,7 @@ export const abi = [{
   "type": "function"
 }]
 
-export const address = "0xe9a9a5b11ed5add6e79ee9bbc256bbf3971ce09f";
+export const address = "0x252f90dcc26e3bbf9285ec5830ac135c277854cc";
 
 export function getCont_hexAddress(address, flags) {
   var address = address.slice(2);
